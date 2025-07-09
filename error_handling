@@ -1,0 +1,42 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ErrorBank {
+    address public owner;
+    mapping(address => uint) private balances;
+
+    error NotOwner();
+    error InsufficientBalance(uint requested, uint available);
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        if (msg.sender != owner) {
+            revert NotOwner();
+        }
+        _;
+    }
+
+    function deposit() external payable {
+        balances[msg.sender] += msg.value;
+    }
+
+    function withdraw(uint amount) external {
+        uint bal = balances[msg.sender];
+        if (bal < amount) {
+            revert InsufficientBalance(amount, bal);
+        }
+        balances[msg.sender] -= amount;
+        payable(msg.sender).transfer(amount);
+    }
+
+    function checkMyBalance() external view returns (uint) {
+        return balances[msg.sender];
+    }
+
+    function getBankBalance() external view onlyOwner returns (uint) {
+        return address(this).balance;
+    }
+}

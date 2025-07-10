@@ -1,0 +1,34 @@
+pragma solidity ^0.8.0;
+
+contract PeopleRegistry {
+    struct Person {
+        string name;
+        uint age;
+    }
+
+    mapping(address => Person) private people;
+
+  
+    function createPerson(string memory _name, uint _age) public {
+        people[msg.sender] = Person(_name, _age);
+    }
+
+  
+    function readPerson(address _address) public view returns (string memory, uint) {
+        Person memory person = people[_address];
+        return (person.name, person.age);
+    }
+
+    
+    function updatePerson(string memory _name, uint _age) public {
+        require(bytes(people[msg.sender].name).length > 0, "Person does not exist.");
+        people[msg.sender].name = _name;
+        people[msg.sender].age = _age;
+    }
+
+
+    function deletePerson() public {
+        require(bytes(people[msg.sender].name).length > 0, "Person does not exist.");
+        delete people[msg.sender];
+    }
+}
